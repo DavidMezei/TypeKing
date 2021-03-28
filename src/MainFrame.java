@@ -28,7 +28,7 @@ public class MainFrame extends JFrame {
         textPane.setText("This is the text that I want to write here!");
         textPane.setSize(new Dimension(100,100));
         textPane.setBounds(200,200,200,200);
-        textPane.setBackground(Color.red);
+        textPane.setBackground(Color.blue);
         textPane.revalidate();
         textPane.repaint();
     }
