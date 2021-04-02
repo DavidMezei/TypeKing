@@ -1,31 +1,39 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Collection;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements KeyListener {
     private JTextPane textPane;
     private JTextField textField;
+
     private Color frameBackgroundColor=Color.black;
+    private Color textBackgroundColor = Color.darkGray.darker();
+    private Color textColor = Color.white;
+
+    private JPanel panelTextPane;
+    private JPanel panelTextField;
+    private String defaultFont="TimesRoman";
 
     MainFrame() {
         setUpFrame();
 
         textPane = new JTextPane();
-        setUpTextPane();
         textField = new JTextField();
         setUpTextField();
-
-        JPanel panelTextPane = new JPanel();
+        setUpTextPane();
+        panelTextPane = new JPanel();
         setUpPanel(panelTextPane,textPane);
-        JPanel panelTextField = new JPanel();
+        panelTextField = new JPanel();
         setUpPanel(panelTextField,textField);
 
-        addComponentsToContentPane(panelTextPane,panelTextField);
-
+        addPanelsToContentPane();
         revalidate();
-        pack();
+       // pack();
     }
 
-    void addComponentsToContentPane(JPanel panelTextPane, JPanel panelTextField){
+    void addPanelsToContentPane(){
         getContentPane().add(Box.createRigidArea(new Dimension(0,50)));
         getContentPane().add(panelTextPane);
         getContentPane().add(Box.createRigidArea(new Dimension(0,25)));
@@ -33,27 +41,35 @@ public class MainFrame extends JFrame {
         getContentPane().add(Box.createRigidArea(new Dimension(0,50)));
     }
 
-    void setUpPanel(JPanel panel, Component comp){
+    void setUpPanel(JPanel panel, Component component){
         panel.setBackground(getContentPane().getBackground());
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         panel.add(Box.createRigidArea(new Dimension(50,0)));
-        panel.add(comp);
+        panel.add(component);
         panel.add(Box.createRigidArea(new Dimension(50,0)));
-
     }
 
     void setUpTextPane(){
-        textPane.setText("This is the text that I want to write here!");
-        textPane.setMaximumSize(new Dimension(1000,200));
-        textPane.setFont(new Font("TimeRoman",Font.PLAIN,40));
+        textPane.setText(fileReader.getRandomText());
+        textPane.setMaximumSize(new Dimension(600,300));
+        textPane.setFont(new Font(defaultFont,Font.PLAIN,40));
         textPane.setBackground(Color.yellow);
+        textPane.setEditable(false);
+        textPane.setBorder(BorderFactory.createLineBorder(Color.cyan.darker(), 5));
+        textPane.setBackground(textBackgroundColor);
+        textPane.setForeground(textColor);
     }
 
     void setUpTextField(){
-        textField.setText("Start to type as fast as you can!");
-        textField.setMaximumSize(new Dimension(2000,60));
-        textField.setFont(new Font("TimesRoma",Font.PLAIN,40));
+        textField.setText("Just start to type!");
+        textField.setMaximumSize(new Dimension(600,60));
+        textField.setFont(new Font(defaultFont,Font.PLAIN,40));
         textField.setBackground(Color.green);
+        textField.setFocusable(true);
+        textField.requestFocus();
+        textField.requestFocusInWindow();
+        textField.setBackground(textBackgroundColor);
+        textField.setForeground(Color.green.darker());
     }
 
     void setUpFrame(){
@@ -63,6 +79,22 @@ public class MainFrame extends JFrame {
         setVisible(true);
         setBounds(600,200,700,700);
         getContentPane().setBackground(frameBackgroundColor);
+        setLocationRelativeTo(null);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
     }
 
 }
