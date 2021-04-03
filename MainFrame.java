@@ -2,89 +2,53 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Collection;
 
 public class MainFrame extends JFrame implements KeyListener {
-    private JTextPane textPane;
-    private JTextField textField;
+    JTextPane textPane;
+    JTextField textField;
 
-    private Color frameBackgroundColor=Color.black;
-    private Color textBackgroundColor = Color.darkGray.darker();
-    private Color textColor = Color.white;
+    Color frameBackgroundColor = Color.black;
+    Color textBackgroundColor = Color.darkGray.darker();
+    Color textColor = Color.white;
 
-    private JPanel panelTextPane;
-    private JPanel panelTextField;
-    private String defaultFont="TimesRoman";
+    JPanel panelTextPane;
+    JPanel panelTextField;
+    String defaultFont = "TimesRoman";
 
+    KeyProcessor keyProcessor;
+    SetUpCollection SetUpCollection;
     MainFrame() {
-        setUpFrame();
+        SetUpCollection=new SetUpCollection(this);
+        SetUpCollection.setUpFrame(this);
 
         textPane = new JTextPane();
+        SetUpCollection.setUpTextPane(textPane);
         textField = new JTextField();
-        setUpTextField();
-        setUpTextPane();
+        SetUpCollection.setUpTextField(textField);
+        textField.addKeyListener(this);
+
         panelTextPane = new JPanel();
-        setUpPanel(panelTextPane,textPane);
+        SetUpCollection.setUpPanel(panelTextPane, textPane);
         panelTextField = new JPanel();
-        setUpPanel(panelTextField,textField);
+        SetUpCollection.setUpPanel(panelTextField, textField);
 
         addPanelsToContentPane();
         revalidate();
-       // pack();
+        keyProcessor = new KeyProcessor(this);
     }
 
-    void addPanelsToContentPane(){
-        getContentPane().add(Box.createRigidArea(new Dimension(0,50)));
+    void addPanelsToContentPane() {
+        getContentPane().add(Box.createRigidArea(new Dimension(0, 50)));
         getContentPane().add(panelTextPane);
-        getContentPane().add(Box.createRigidArea(new Dimension(0,25)));
+        getContentPane().add(Box.createRigidArea(new Dimension(0, 25)));
         getContentPane().add(panelTextField);
-        getContentPane().add(Box.createRigidArea(new Dimension(0,50)));
+        getContentPane().add(Box.createRigidArea(new Dimension(0, 50)));
     }
 
-    void setUpPanel(JPanel panel, Component component){
-        panel.setBackground(getContentPane().getBackground());
-        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
-        panel.add(Box.createRigidArea(new Dimension(50,0)));
-        panel.add(component);
-        panel.add(Box.createRigidArea(new Dimension(50,0)));
-    }
-
-    void setUpTextPane(){
-        textPane.setText(fileReader.getRandomText());
-        textPane.setMaximumSize(new Dimension(600,300));
-        textPane.setFont(new Font(defaultFont,Font.PLAIN,40));
-        textPane.setBackground(Color.yellow);
-        textPane.setEditable(false);
-        textPane.setBorder(BorderFactory.createLineBorder(Color.cyan.darker(), 5));
-        textPane.setBackground(textBackgroundColor);
-        textPane.setForeground(textColor);
-    }
-
-    void setUpTextField(){
-        textField.setText("Just start to type!");
-        textField.setMaximumSize(new Dimension(600,60));
-        textField.setFont(new Font(defaultFont,Font.PLAIN,40));
-        textField.setBackground(Color.green);
-        textField.setFocusable(true);
-        textField.requestFocus();
-        textField.requestFocusInWindow();
-        textField.setBackground(textBackgroundColor);
-        textField.setForeground(Color.green.darker());
-    }
-
-    void setUpFrame(){
-        setLayout(new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS));
-        setTitle("TypeKing");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
-        setBounds(600,200,700,700);
-        getContentPane().setBackground(frameBackgroundColor);
-        setLocationRelativeTo(null);
-    }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-
+    public void keyPressed(KeyEvent keyEvent) {
+        keyProcessor.keyProcessing(keyEvent);
     }
 
     @Override

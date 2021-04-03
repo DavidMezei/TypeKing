@@ -4,11 +4,11 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
 
-public class fileReader {
+public class FileReader {
     private static Vector<String> textList = new Vector<String>();
     private final String fileName = "C:\\Users\\mezei\\Desktop\\Java Programs\\TypeKing\\src\\texts.txt";
 
-    private fileReader() {
+    private FileReader() {
         String text = "";
         String nextLine;
         File file = new File(fileName);
@@ -30,7 +30,7 @@ public class fileReader {
 
     public static String getRandomText() {
         Random random = new Random();
-        fileReader reader=new fileReader();
+        FileReader reader=new FileReader();
         int randomIndex = random.nextInt(textList.size());
         return textList.get(randomIndex);
     }
