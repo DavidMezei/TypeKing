@@ -9,14 +9,16 @@ public class KeyProcessor {
     private MainFrame mainFrame;
     private boolean firstKeyProcessingCall = true;
     private TextPaneHighlighter textPaneHighlighter;
-    private TextPaneHighlighter textPaneCursorHighlighter;
+    private TextPaneHighlighter textPaneCaretHighlighter;
     private String textPaneText;
+    private LabelsThread labelsThread;
 
     KeyProcessor(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-        textPaneCursorHighlighter = new TextPaneHighlighter(mainFrame.textPane, new Color(70, 70, 0));
+        textPaneCaretHighlighter = new TextPaneHighlighter(mainFrame.textPane, new Color(70, 70, 0));
         textPaneHighlighter = new TextPaneHighlighter(mainFrame.textPane, Color.red);
         textPaneText=mainFrame.textPane.getText();
+        labelsThread=new LabelsThread(this,mainFrame.labelWPM,mainFrame.labelElapsedTime);
     }
 
     public void keyProcessing(KeyEvent keyEvent) {
@@ -26,6 +28,7 @@ public class KeyProcessor {
             if (firstKeyProcessingCall) {
                 firstKeyProcessingCall = false;
                 setTextFieldForFirstCall();
+                labelsThread.start();
             }
         } else if ((int) keyChar == KeyEvent.VK_BACK_SPACE) {
             if (keyEvent.isControlDown()) {
@@ -47,12 +50,13 @@ public class KeyProcessor {
                 textPaneHighlighter.addHighlight(caretIndex);
                 mainFrame.textField.setBackground(Color.red);
             }
-            textPaneCursorHighlighter.removeHighlight(caretIndex);
+            textPaneCaretHighlighter.removeHighlight(caretIndex);
             caretIndex++;
-            textPaneCursorHighlighter.addHighlight(caretIndex);
+            textPaneCaretHighlighter.addHighlight(caretIndex);
             if (caretIndex == textPaneText.length() && textPaneHighlighter.highlightsMap.isEmpty()) {
                 mainFrame.textField.setText("");
                 mainFrame.textField.setEditable(false);
+                labelsThread.stopLabelsThread();
             }
         } else {
             caretIndex++;
@@ -81,10 +85,10 @@ public class KeyProcessor {
     private void processBackspace() {
         if (caretIndex > 0) {
             if (!caretIsOutOfText()) {
-                textPaneCursorHighlighter.removeHighlight(caretIndex);
+                textPaneCaretHighlighter.removeHighlight(caretIndex);
                 caretIndex--;
                 textPaneHighlighter.removeHighlight(caretIndex);
-                textPaneCursorHighlighter.addHighlight(caretIndex);
+                textPaneCaretHighlighter.addHighlight(caretIndex);
                 TextPaneLetterPainter.paintLetter(mainFrame.textPane, caretIndex, mainFrame.textColor);
                 if (textPaneHighlighter.highlightsMap.isEmpty()) {
                     mainFrame.textField.setBackground(mainFrame.textBackgroundColor);
@@ -97,12 +101,12 @@ public class KeyProcessor {
 
     private void processCtrlBackspace() {
         int deleteStartIndex=findFirstSpaceBackwardsInTextPane(caretIndex-1);
-        textPaneCursorHighlighter.removeHighlight(caretIndex);
+        textPaneCaretHighlighter.removeHighlight(caretIndex);
         textPaneHighlighter.removeHighlight(deleteStartIndex,caretIndex);
         TextPaneLetterPainter.paintLetter(mainFrame.textPane,deleteStartIndex,caretIndex,mainFrame.textColor);
         if (deleteStartIndex!=0) deleteStartIndex++;
         caretIndex=deleteStartIndex;
-        textPaneCursorHighlighter.addHighlight(caretIndex);
+        textPaneCaretHighlighter.addHighlight(caretIndex);
         if (textPaneHighlighter.highlightsMap.isEmpty()){
             mainFrame.textField.setBackground(mainFrame.textBackgroundColor);
         }
@@ -122,5 +126,9 @@ public class KeyProcessor {
     private void setTextFieldForFirstCall() {
         mainFrame.textField.setText("");
         mainFrame.textField.setForeground(mainFrame.textColor);
+    }
+
+    public int getCaretIndex(){
+        return caretIndex;
     }
 }
