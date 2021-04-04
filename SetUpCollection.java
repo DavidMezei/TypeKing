@@ -30,12 +30,9 @@ public class SetUpCollection {
         textField.setText("Just start to type!");
         textField.setMaximumSize(new Dimension(600,60));
         textField.setFont(new Font(mainFrame.defaultFont,Font.PLAIN,40));
-        textField.setFocusable(true);
         textField.setBackground(mainFrame.textBackgroundColor);
         textField.setForeground(Color.green.darker());
-        textField.requestFocusInWindow();
-        textField.requestFocus();
-    }
+   }
 
     public  void setUpFrame(JFrame frame){
         frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.PAGE_AXIS));
