@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
+import static java.lang.Thread.currentThread;
 import static java.lang.Thread.sleep;
 
 public class KeyProcessor {
@@ -9,11 +10,13 @@ public class KeyProcessor {
     private boolean firstKeyProcessingCall = true;
     private TextPaneHighlighter textPaneHighlighter;
     private TextPaneHighlighter textPaneCursorHighlighter;
+    private String textPaneText;
 
     KeyProcessor(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         textPaneCursorHighlighter = new TextPaneHighlighter(mainFrame.textPane, new Color(70, 70, 0));
         textPaneHighlighter = new TextPaneHighlighter(mainFrame.textPane, Color.red);
+        textPaneText=mainFrame.textPane.getText();
     }
 
     public void keyProcessing(KeyEvent keyEvent) {
@@ -34,7 +37,6 @@ public class KeyProcessor {
     }
 
     private void processKey(char keyChar) {
-        String textPaneText = mainFrame.textPane.getText();
         if (!caretIsAtTheEndOrForth()) {
             if (keyChar == textPaneText.charAt(caretIndex)) {
                 if (textPaneHighlighter.highlightsMap.isEmpty() && (int) keyChar == KeyEvent.VK_SPACE) {
@@ -93,9 +95,28 @@ public class KeyProcessor {
         }
     }
 
-    //TODO make it full real with textField
     private void processCtrlBackspace() {
+        int deleteStartIndex=findFirstSpaceBackwardsInTextPane(caretIndex-1);
+        textPaneCursorHighlighter.removeHighlight(caretIndex);
+        textPaneHighlighter.removeHighlight(deleteStartIndex,caretIndex);
+        TextPaneLetterPainter.paintLetter(mainFrame.textPane,deleteStartIndex,caretIndex,mainFrame.textColor);
+        if (deleteStartIndex!=0) deleteStartIndex++;
+        caretIndex=deleteStartIndex;
+        textPaneCursorHighlighter.addHighlight(caretIndex);
+        if (textPaneHighlighter.highlightsMap.isEmpty()){
+            mainFrame.textField.setBackground(mainFrame.textBackgroundColor);
+        }
+    }
 
+    private int findFirstSpaceBackwardsInTextPane(int index) {
+        if (index==-1) return 0;
+        if ((int)textPaneText.charAt(index)==KeyEvent.VK_SPACE){
+            index--;
+        }
+        while ((int)textPaneText.charAt(index)!=KeyEvent.VK_SPACE && index>0){
+            index--;
+        }
+        return index;
     }
 
     private void setTextFieldForFirstCall() {
