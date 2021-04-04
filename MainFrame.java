@@ -26,7 +26,6 @@ public class MainFrame extends JFrame implements KeyListener {
         textField = new JTextField();
         SetUpCollection.setUpTextField(textField);
         textField.addKeyListener(this);
-
         panelTextPane = new JPanel();
         SetUpCollection.setUpPanel(panelTextPane, textPane);
         panelTextField = new JPanel();
@@ -34,6 +33,7 @@ public class MainFrame extends JFrame implements KeyListener {
 
         addPanelsToContentPane();
         revalidate();
+        textField.requestFocusInWindow();
         keyProcessor = new KeyProcessor(this);
     }
 
