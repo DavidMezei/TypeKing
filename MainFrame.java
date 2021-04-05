@@ -13,14 +13,16 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
     Color textBackgroundColor = Color.darkGray.darker();
     Color textColor = Color.white;
     String defaultFont = "TimesRoman";
-    JButton buttonTryAgain = new JButton();
-    JButton buttonNewText = new JButton();
+    JButton buttonTryAgain = new JButton("Try again");
+    JButton buttonNewText = new JButton("New text");
     JPanel panelTextPane = new JPanel();
     JPanel panelTextField = new JPanel();
     JPanel panelLabels = new JPanel();
+    JPanel panelButtons = new JPanel();
     JLabel labelWPM = new JLabel("0 WPM");
     JLabel labelElapsedTime = new JLabel("Time: 0:00");
     KeyProcessor keyProcessor;
+    ButtonActionProcessor buttonActionProcessor;
     SetUpCollection SetUpCollection;
 
     MainFrame() {
@@ -28,18 +30,27 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         SetUpCollection.setUpFrame(this);
         SetUpCollection.setUpTextPane(textPane);
         SetUpCollection.setUpTextField(textField);
-        SetUpCollection.setUpPanel(panelTextPane, textPane);
-        SetUpCollection.setUpPanel(panelTextField, textField);
-        SetUpCollection.setUpPanel(panelLabels, labelWPM);
-        SetUpCollection.setUpPanel(panelLabels, labelElapsedTime);
+        SetUpCollection.setUpPanel(panelTextPane);
+        SetUpCollection.addComponentToPanel(panelTextPane, textPane);
+        SetUpCollection.setUpPanel(panelTextField);
+        SetUpCollection.addComponentToPanel(panelTextField, textField);
+        SetUpCollection.setUpPanel(panelLabels);
+        SetUpCollection.addComponentToPanel(panelLabels, labelWPM);
+        SetUpCollection.addComponentToPanel(panelLabels, labelElapsedTime);
         SetUpCollection.setUpLabel(labelWPM);
         SetUpCollection.setUpLabel(labelElapsedTime);
+        SetUpCollection.setUpPanel(panelButtons);
+        SetUpCollection.addComponentToPanel(panelButtons,buttonNewText);
+        SetUpCollection.addComponentToPanel(panelButtons,buttonTryAgain);
+        SetUpCollection.setUpButton(buttonTryAgain);
+        SetUpCollection.setUpButton(buttonNewText);
 
         addPanelsToContentPane();
         addListeners();
         revalidate();
         textField.requestFocusInWindow();
         keyProcessor = new KeyProcessor(this);
+        buttonActionProcessor=new ButtonActionProcessor(this);
     }
 
     void addPanelsToContentPane() {
@@ -50,6 +61,8 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         getContentPane().add(Box.createRigidArea(new Dimension(0, 25)));
         getContentPane().add(panelTextField);
         getContentPane().add(Box.createRigidArea(new Dimension(0, 50)));
+        getContentPane().add(panelButtons);
+        getContentPane().add(Box.createRigidArea(new Dimension(0,50)));
     }
 
     void addListeners() {
@@ -74,7 +87,7 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-
+    public void actionPerformed(ActionEvent actionEvent) {
+        buttonActionProcessor.buttonActionProcessing(actionEvent);
     }
 }
