@@ -8,10 +8,13 @@ public class SetUpCollection {
         this.mainFrame = mainFrame;
     }
 
-    public void setUpPanel(JPanel panel, Component component){
+    public void setUpPanel(JPanel panel){
         panel.setBackground(mainFrame.frameBackgroundColor);
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         panel.add(Box.createRigidArea(new Dimension(50,0)));
+    }
+
+    public void addComponentToPanel(JPanel panel, Component component){
         panel.add(component);
         panel.add(Box.createRigidArea(new Dimension(50,0)));
     }
@@ -48,5 +51,12 @@ public class SetUpCollection {
         label.setMaximumSize(new Dimension(200,70));
         label.setFont(new Font(mainFrame.defaultFont,Font.PLAIN,50));
         label.setForeground(mainFrame.labelColor);
+    }
+
+    public void setUpButton(JButton button){
+        button.setMaximumSize(new Dimension(300,100));
+        button.setFont(new Font(mainFrame.defaultFont,Font.PLAIN,40));
+        button.setForeground(Color.orange);
+        button.setBackground(Color.blue.darker());
     }
 }
