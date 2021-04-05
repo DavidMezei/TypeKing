@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class ButtonActionProcessor {
@@ -18,22 +19,27 @@ public class ButtonActionProcessor {
     }
 
     private void processButtonTryAgain() {
-        keyProcessor.labelsThread.stopLabelsThread();
-        keyProcessor.textPaneHighlighter.removeHighlight(0, keyProcessor.getCaretIndex());
-        keyProcessor.textPaneCaretHighlighter.removeHighlight(0, keyProcessor.getCaretIndex());
-        TextPaneLetterPainter.paintLetter(mainFrame.textPane, 0, keyProcessor.getCaretIndex(), mainFrame.textColor);
-        keyProcessor.setCaretIndexToZero();
-        keyProcessor.firstKeyProcessingCall = true;
+        processButton();
     }
 
     private void processButtonNewText() {
+        processButton();
+        keyProcessor.textPaneText = FileReader.getRandomText();
+    }
+
+    private void processButton(){
         keyProcessor.labelsThread.stopLabelsThread();
         keyProcessor.textPaneHighlighter.removeHighlight(0, keyProcessor.getCaretIndex());
         keyProcessor.textPaneCaretHighlighter.removeHighlight(0, keyProcessor.getCaretIndex());
         TextPaneLetterPainter.paintLetter(mainFrame.textPane, 0, keyProcessor.getCaretIndex(), mainFrame.textColor);
         keyProcessor.setCaretIndexToZero();
-        keyProcessor.textPaneText = FileReader.getRandomText();
-        mainFrame.textPane.setText(keyProcessor.textPaneText);
         keyProcessor.firstKeyProcessingCall = true;
+        mainFrame.labelWPM.setText("0 WPM");
+        mainFrame.labelElapsedTime.setText("Time: 0:00");
+        mainFrame.textField.setText("Just start to type!");
+        mainFrame.textField.setEditable(true);
+        mainFrame.textField.setForeground(Color.green.darker());
+        mainFrame.textField.setBackground(mainFrame.textBackgroundColor);
+        mainFrame.textField.requestFocusInWindow();
     }
 }
