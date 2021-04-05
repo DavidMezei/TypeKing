@@ -7,29 +7,30 @@ import static java.lang.Thread.sleep;
 public class KeyProcessor {
     private int caretIndex = 0;
     private MainFrame mainFrame;
-    private boolean firstKeyProcessingCall = true;
-    private TextPaneHighlighter textPaneHighlighter;
-    private TextPaneHighlighter textPaneCaretHighlighter;
-    private String textPaneText;
-    private LabelsThread labelsThread;
+    boolean firstKeyProcessingCall = true;
+    TextPaneHighlighter textPaneHighlighter;
+    TextPaneHighlighter textPaneCaretHighlighter;
+    String textPaneText;
+    LabelsThread labelsThread;
 
     KeyProcessor(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         textPaneCaretHighlighter = new TextPaneHighlighter(mainFrame.textPane, new Color(70, 70, 0));
         textPaneHighlighter = new TextPaneHighlighter(mainFrame.textPane, Color.red);
         textPaneText=mainFrame.textPane.getText();
-        labelsThread=new LabelsThread(this,mainFrame.labelWPM,mainFrame.labelElapsedTime);
     }
 
     public void keyProcessing(KeyEvent keyEvent) {
         char keyChar = keyEvent.getKeyChar();
         if (isAppropriateKey(keyChar)) {
-            processKey(keyChar);
             if (firstKeyProcessingCall) {
                 firstKeyProcessingCall = false;
+                mainFrame.textField.setEditable(true);
                 setTextFieldForFirstCall();
+                labelsThread=new LabelsThread(this,mainFrame.labelWPM,mainFrame.labelElapsedTime);
                 labelsThread.start();
             }
+            processKey(keyChar);
         } else if ((int) keyChar == KeyEvent.VK_BACK_SPACE) {
             if (keyEvent.isControlDown()) {
                 processCtrlBackspace();
@@ -130,5 +131,9 @@ public class KeyProcessor {
 
     public int getCaretIndex(){
         return caretIndex;
+    }
+
+    public void setCaretIndexToZero(){
+        caretIndex=0;
     }
 }
