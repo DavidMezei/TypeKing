@@ -3,7 +3,6 @@ public class ThreadSleep {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 }
