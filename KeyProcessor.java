@@ -1,98 +1,116 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-import static java.lang.Thread.currentThread;
-import static java.lang.Thread.sleep;
-
 public class KeyProcessor {
     private int caretIndex = 0;
     private MainFrame mainFrame;
-    boolean firstKeyProcessingCall = true;
-    TextPaneHighlighter textPaneHighlighter;
-    TextPaneHighlighter textPaneCaretHighlighter;
-    String textPaneText;
-    LabelsThread labelsThread;
+    private boolean firstKeyProcessingCall = true;
+    private TextPaneHighlighter textPaneRedHighlighter;
+    private TextPaneHighlighter textPaneCaretHighlighter;
+    private String textPaneText;
+    private LabelsThread labelsThread;
+    private LabelAccuracyProcessor labelAccuracyProcessor;
 
     KeyProcessor(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
-        textPaneCaretHighlighter = new TextPaneHighlighter(mainFrame.textPane, new Color(70, 70, 0));
-        textPaneHighlighter = new TextPaneHighlighter(mainFrame.textPane, Color.red);
-        textPaneText=mainFrame.textPane.getText();
+        textPaneCaretHighlighter = new TextPaneHighlighter(mainFrame.getTextPane(), new Color(70, 70, 0));
+        textPaneRedHighlighter = new TextPaneHighlighter(mainFrame.getTextPane(), Color.red);
+        labelAccuracyProcessor = new LabelAccuracyProcessor(mainFrame.getLabelAccuracyPercentage());
+        labelsThread = new LabelsThread(this, mainFrame.getLabelWPM(), mainFrame.getLabelElapsedTime());
     }
 
     public void keyProcessing(KeyEvent keyEvent) {
-        char keyChar = keyEvent.getKeyChar();
-        if (isAppropriateKey(keyChar)) {
-            if (firstKeyProcessingCall) {
-                firstKeyProcessingCall = false;
-                mainFrame.textField.setEditable(true);
-                setTextFieldForFirstCall();
-                labelsThread=new LabelsThread(this,mainFrame.labelWPM,mainFrame.labelElapsedTime);
-                labelsThread.start();
-            }
-            processKey(keyChar);
-        } else if ((int) keyChar == KeyEvent.VK_BACK_SPACE) {
-            if (keyEvent.isControlDown()) {
+        char pressedKeyChar = keyEvent.getKeyChar();
+        ifButtonShortcutThenExecuteIt(keyEvent);
+        if (isAppropriateKey(pressedKeyChar)) {
+            if (firstKeyProcessingCall)
+                firstKeyProcessingCallSetUp();
+            processPressedKey(pressedKeyChar);
+        } else if ((int) pressedKeyChar == KeyEvent.VK_BACK_SPACE) {
+            if (keyEvent.isControlDown())
                 processCtrlBackspace();
-            } else {
+            else
                 processBackspace();
-            }
         }
     }
 
-    private void processKey(char keyChar) {
-        if (!caretIsAtTheEndOrForth()) {
-            if (keyChar == textPaneText.charAt(caretIndex)) {
-                if (textPaneHighlighter.highlightsMap.isEmpty() && (int) keyChar == KeyEvent.VK_SPACE) {
-                    mainFrame.textField.setText("");
-                }
-                TextPaneLetterPainter.paintLetter(mainFrame.textPane, caretIndex, Color.GREEN.darker());
-            } else {
-                textPaneHighlighter.addHighlight(caretIndex);
-                mainFrame.textField.setBackground(Color.red);
-            }
-            textPaneCaretHighlighter.removeHighlight(caretIndex);
-            caretIndex++;
-            textPaneCaretHighlighter.addHighlight(caretIndex);
-            if (caretIndex == textPaneText.length() && textPaneHighlighter.highlightsMap.isEmpty()) {
-                mainFrame.textField.setText("");
-                mainFrame.textField.setEditable(false);
-                labelsThread.stopLabelsThread();
-            }
-        } else {
-            caretIndex++;
-        }
-    }
-
-    private boolean caretIsAtTheEndOrForth() {
-        if (caretIndex >= mainFrame.textPane.getText().length()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private boolean caretIsOutOfText() {
-        return caretIndex > mainFrame.textPane.getText().length();
-    }
-
-    private boolean isAppropriateKey(char keyChar) {
-        int keyCode = (int) keyChar;
+    private boolean isAppropriateKey(char pressedKeyChar) {
+        int keyCode = (int) pressedKeyChar;
         if (keyCode == KeyEvent.VK_SPACE || keyCode == 34) return true;
         if (keyCode > 0 && keyCode < 37) return false;
         return keyCode < 123;
     }
 
+    private void firstKeyProcessingCallSetUp() {
+        textPaneText = mainFrame.getTextPane().getText();
+        firstKeyProcessingCall = false;
+        mainFrame.getTextField().setEditable(true);
+        setTextFieldForFirstCall();
+        labelsThread = new LabelsThread(this, mainFrame.getLabelWPM(), mainFrame.getLabelElapsedTime());
+        labelsThread.start();
+        labelAccuracyProcessor.setTextLength(textPaneText.length());
+        mainFrame.getLabelAccuracyPercentage().setForeground(Color.green);
+    }
+
+    private void ifButtonShortcutThenExecuteIt(KeyEvent keyEvent) {
+        int pressedKeyCode = keyEvent.getKeyCode();
+        if (keyEvent.isControlDown()) {
+            if (pressedKeyCode == KeyEvent.VK_T)
+                mainFrame.getButtonTryAgain().doClick();
+            else if (pressedKeyCode == KeyEvent.VK_N)
+                mainFrame.getButtonNewText().doClick();
+        }
+    }
+
+    private void processPressedKey(char pressedKeyChar) {
+        if (caretIndex < textPaneText.length()) {
+            if (pressedKeyChar == textPaneText.charAt(caretIndex)) {
+                processRightKey(pressedKeyChar);
+            } else {
+                processWrongKey();
+            }
+            textPaneCaretHighlighter.removeHighlight(caretIndex);
+            textPaneCaretHighlighter.addHighlight(caretIndex + 1);
+            if (caretIsAtTextEndAndThereIsNoWrongKeyTyped()) {
+                endThisRound();
+           }
+        }
+        caretIndex++;
+    }
+
+    private void endThisRound(){
+        mainFrame.getTextField().setText("");
+        mainFrame.getTextField().setEditable(false);
+        labelsThread.stopLabelsThread();
+    }
+
+    private boolean caretIsAtTextEndAndThereIsNoWrongKeyTyped(){
+        return caretIndex == textPaneText.length() - 1 && textPaneRedHighlighter.getHighlightsMap().isEmpty();
+    }
+
+    private void processWrongKey() {
+        textPaneRedHighlighter.addHighlight(caretIndex);
+        mainFrame.getTextField().setBackground(Color.red);
+        labelAccuracyProcessor.updateLabelAccuracy();
+    }
+
+    private void processRightKey(char pressedKeyChar) {
+        TextPaneLetterPainter.paintLetter(mainFrame.getTextPane(), caretIndex, Color.GREEN.darker());
+        if (textPaneRedHighlighter.getHighlightsMap().isEmpty() && (int) pressedKeyChar == KeyEvent.VK_SPACE) {
+            mainFrame.getTextField().setText("");
+        }
+    }
+
     private void processBackspace() {
         if (caretIndex > 0) {
-            if (!caretIsOutOfText()) {
+            if (caretIndex <= textPaneText.length()) {
                 textPaneCaretHighlighter.removeHighlight(caretIndex);
                 caretIndex--;
-                textPaneHighlighter.removeHighlight(caretIndex);
+                textPaneRedHighlighter.removeHighlight(caretIndex);
                 textPaneCaretHighlighter.addHighlight(caretIndex);
-                TextPaneLetterPainter.paintLetter(mainFrame.textPane, caretIndex, mainFrame.textColor);
-                if (textPaneHighlighter.highlightsMap.isEmpty()) {
-                    mainFrame.textField.setBackground(mainFrame.textBackgroundColor);
+                TextPaneLetterPainter.paintLetter(mainFrame.getTextPane(), caretIndex, mainFrame.getTextColor());
+                if (textPaneRedHighlighter.getHighlightsMap().isEmpty()) {
+                    mainFrame.getTextField().setBackground(mainFrame.getTextBackgroundColor());
                 }
             } else {
                 caretIndex--;
@@ -101,39 +119,68 @@ public class KeyProcessor {
     }
 
     private void processCtrlBackspace() {
-        int deleteStartIndex=findFirstSpaceBackwardsInTextPane(caretIndex-1);
+        int firstSpaceBackwardsIndex = findFirstSpaceBackwardsInTextPane(caretIndex - 1);
         textPaneCaretHighlighter.removeHighlight(caretIndex);
-        textPaneHighlighter.removeHighlight(deleteStartIndex,caretIndex);
-        TextPaneLetterPainter.paintLetter(mainFrame.textPane,deleteStartIndex,caretIndex,mainFrame.textColor);
-        if (deleteStartIndex!=0) deleteStartIndex++;
-        caretIndex=deleteStartIndex;
+        textPaneRedHighlighter.removeHighlight(firstSpaceBackwardsIndex, caretIndex);
+        TextPaneLetterPainter.paintLetter(mainFrame.getTextPane(), firstSpaceBackwardsIndex, caretIndex, mainFrame.getTextColor());
+        if (firstSpaceBackwardsIndex != 0) firstSpaceBackwardsIndex++;
+        caretIndex = firstSpaceBackwardsIndex;
         textPaneCaretHighlighter.addHighlight(caretIndex);
-        if (textPaneHighlighter.highlightsMap.isEmpty()){
-            mainFrame.textField.setBackground(mainFrame.textBackgroundColor);
+        if (textPaneRedHighlighter.getHighlightsMap().isEmpty()) {
+            mainFrame.getTextField().setBackground(mainFrame.getTextBackgroundColor());
         }
     }
 
     private int findFirstSpaceBackwardsInTextPane(int index) {
-        if (index==-1) return 0;
-        if ((int)textPaneText.charAt(index)==KeyEvent.VK_SPACE){
+        if (index == -1) return 0;
+        if (index >= textPaneText.length()) index = textPaneText.length() - 1;
+        if ((int) textPaneText.charAt(index) == KeyEvent.VK_SPACE) {
             index--;
         }
-        while ((int)textPaneText.charAt(index)!=KeyEvent.VK_SPACE && index>0){
+        while ((int) textPaneText.charAt(index) != KeyEvent.VK_SPACE && index > 0) {
             index--;
         }
         return index;
     }
 
     private void setTextFieldForFirstCall() {
-        mainFrame.textField.setText("");
-        mainFrame.textField.setForeground(mainFrame.textColor);
+        mainFrame.getTextField().setText("");
+        mainFrame.getTextField().setForeground(mainFrame.getTextColor());
     }
 
-    public int getCaretIndex(){
+    public int getCaretIndex() {
         return caretIndex;
     }
 
-    public void setCaretIndexToZero(){
-        caretIndex=0;
+    public void setCaretIndexToZero() {
+        caretIndex = 0;
+    }
+
+    public void setFirstKeyProcessingCallToTrue() {
+        firstKeyProcessingCall = true;
+    }
+
+    public TextPaneHighlighter getTextPaneRedHighlighter() {
+        return textPaneRedHighlighter;
+    }
+
+    public TextPaneHighlighter getTextPaneCaretHighlighter() {
+        return textPaneCaretHighlighter;
+    }
+
+    public String getTextPaneText() {
+        return textPaneText;
+    }
+
+    public LabelsThread getLabelsThread() {
+        return labelsThread;
+    }
+
+    public void setTextPaneText(String textPaneText) {
+        this.textPaneText = textPaneText;
+    }
+
+    public LabelAccuracyProcessor getLabelAccuracyProcessor() {
+        return labelAccuracyProcessor;
     }
 }
