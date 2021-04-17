@@ -5,6 +5,8 @@ import java.util.Scanner;
 import java.util.Vector;
 
 public class FileReader {
+    private static int lastRandomIndex = -1;
+    private static boolean firstCall = true;
     private static Vector<String> textList = new Vector<String>();
     private final String fileName = "C:\\Users\\mezei\\Desktop\\Java Programs\\TypeKing\\src\\texts.txt";
 
@@ -30,8 +32,16 @@ public class FileReader {
 
     public static String getRandomText() {
         Random random = new Random();
-        FileReader reader=new FileReader();
-        int randomIndex = random.nextInt(textList.size());
+        if (firstCall) {
+            firstCall = false;
+            new FileReader();
+        }
+        int randomIndex;
+        do {
+            randomIndex = random.nextInt(textList.size());
+        } while (randomIndex == lastRandomIndex);
+        lastRandomIndex=randomIndex;
+
         return textList.get(randomIndex);
     }
 }
