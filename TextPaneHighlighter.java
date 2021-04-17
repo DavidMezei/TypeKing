@@ -9,11 +9,13 @@ import java.util.Map;
 public class TextPaneHighlighter {
     private DefaultHighlighter.DefaultHighlightPainter highlightPainter;
     private Highlighter paneHighlighter;
-    Map<Integer,Highlighter.Highlight> highlightsMap=new HashMap<>();
+    private HashMap<Integer,Highlighter.Highlight> highlightsMap;
+
 
     TextPaneHighlighter(JTextPane textPane, Color highlightColor){
         paneHighlighter=textPane.getHighlighter();
         highlightPainter=new DefaultHighlighter.DefaultHighlightPainter(highlightColor);
+        highlightsMap = new HashMap<>();
     }
 
     void addHighlight(int startIndex){
@@ -32,7 +34,7 @@ public class TextPaneHighlighter {
            highlightsMap.remove(startIndex);
        }
     }
-    //TODO test it if it's okay
+
     void removeHighlight(int startIndex, int endIndex){
        while (startIndex<=endIndex){
            if (highlightsMap.get(startIndex) != null) {
@@ -41,5 +43,9 @@ public class TextPaneHighlighter {
            }
            startIndex++;
        }
+    }
+
+    public HashMap<Integer, Highlighter.Highlight> getHighlightsMap() {
+        return highlightsMap;
     }
 }
