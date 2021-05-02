@@ -24,15 +24,16 @@ public class ButtonActionProcessor {
 
     private void processButtonNewText() {
         processButton();
-        keyProcessor.setTextPaneText(FileReader.getRandomText());
+        keyProcessor.setTextPaneText(TextFileReader.getRandomText());
         mainFrame.getTextPane().setText(keyProcessor.getTextPaneText());
+        HistoryPanelUploader.uploadLoadedHistoriesToPanel();
+        mainFrame.revalidate();
     }
 
     private void processButton() {
         keyProcessor.getLabelsThread().stopLabelsThread();
-        keyProcessor.getLabelsThread().interrupt();
         keyProcessor.getTextPaneRedHighlighter().removeHighlight(0, keyProcessor.getCaretIndex());
-        keyProcessor.getTextPaneCaretHighlighter().removeHighlight(keyProcessor.getCaretIndex());
+        keyProcessor.getTextPaneCaretHighlighter().removeHighlight(0, keyProcessor.getCaretIndex());
         TextPaneLetterPainter.paintLetter(mainFrame.getTextPane(), 0, keyProcessor.getCaretIndex(), mainFrame.getTextColor());
         keyProcessor.setCaretIndexToZero();
         keyProcessor.setFirstKeyProcessingCallToTrue();
