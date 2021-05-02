@@ -1,16 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.Vector;
 
 public class LabelAccuracyProcessor {
     private int mistakeCounter = 0;
     private int textLength;
-    private JLabel labelAccuracyPercentage;
-    private double lastPercentage = 100;
-    private int red = 0;
-    private int green = 255;
+    private static JLabel labelAccuracyPercentage;
+    private static Vector<Color> percentageColors;
 
     LabelAccuracyProcessor(JLabel labelAccuracyPercentage) {
-        this.labelAccuracyPercentage = labelAccuracyPercentage;
+        LabelAccuracyProcessor.labelAccuracyPercentage = labelAccuracyPercentage;
     }
 
     public void setTextLength(int textLength) {
@@ -20,33 +19,43 @@ public class LabelAccuracyProcessor {
     public void updateLabelAccuracy() {
         mistakeCounter++;
         int remainedKeys = textLength - mistakeCounter;
-        double percentage = remainedKeys / (double) textLength;
+        float percentage = remainedKeys / (float) textLength;
         percentage *= 100;
-        updateLabelAccuracyColorRedGreen(percentage);
-        labelAccuracyPercentage.setForeground(new Color(red, green, 0));
+        setAccuracyPercentageWithColor(percentage);
+    }
+
+    public static Color getColorOfPercentage(float percentage){
+        if (percentageColors==null) createPercentageColorsVector();
+        if (percentage==100) return percentageColors.get(9);
+        if (percentage>=90) return percentageColors.get((int) (percentage%10));
+        else return Color.red;
+    }
+
+    public static void setAccuracyPercentageWithColor(float percentage){
+        labelAccuracyPercentage.setForeground(getColorOfPercentage(percentage));
         labelAccuracyPercentage.setText(String.format("%.1f", percentage) + "%");
     }
 
-    private void updateLabelAccuracyColorRedGreen(double percentage) {
-        double multiplier = lastPercentage - percentage;
-        int pace = (int) (45 * multiplier);
-        if (red < 255) {
-            red += pace;
-            if (red > 255) red = 255;
+    private static void createPercentageColorsVector() {
+        int i = 10;
+        int green = 0;
+        int red = 255;
+        percentageColors = new Vector<>();
+        while (i > 0) {
+            percentageColors.add(new Color(red, green, 0));
+            if (green < 255) {
+                green += 51;
+            }
+            if (green == 255) {
+                red -= 51;
+            }
+            i--;
         }
-        if (red == 255) {
-            green -= pace;
-            if (green < 0) green = 0;
-        }
-        lastPercentage = percentage;
     }
 
     public void setDefaultLabelAccuracy() {
-        red = 0;
-        green = 255;
         mistakeCounter = 0;
         labelAccuracyPercentage.setText("100%");
         labelAccuracyPercentage.setForeground(Color.cyan);
-        lastPercentage = 100;
     }
 }
