@@ -1,15 +1,13 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.io.IOException;
 
 public class MainFrame extends JFrame implements KeyListener, ActionListener {
     private JTextPane textPane;
     private JTextField textField;
     private Color labelColor;
-    private Color frameBackgroundColor;
+    private static Color frameBackgroundColor;
     private Color textBackgroundColor;
     private Color textColor;
     private String defaultFont;
@@ -26,6 +24,9 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
     private KeyProcessor keyProcessor;
     private ButtonActionProcessor buttonActionProcessor;
     private SetUpCollection SetUpCollection;
+    private static JPanel historyPanel;
+    private JLabel historyLabel;
+    private JPanel historyLabelPanel;
 
     MainFrame() {
         createAndInitializeObjects();
@@ -56,30 +57,37 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         labelAccuracyPercentage = new JLabel("100%");
         keyProcessor = new KeyProcessor(this);
         buttonActionProcessor = new ButtonActionProcessor(this);
+        historyPanel = new JPanel();
+        historyLabel = new JLabel();
+        historyLabelPanel = new JPanel();
     }
 
     private void callSetUps() {
         SetUpCollection.setUpFrame(this);
         SetUpCollection.setUpPanel(panelTextField);
-        SetUpCollection.addComponentToPanel(panelTextField, textField);
+        SetUpCollection.addComponentToPanelWithRigidArea(panelTextField, textField);
         SetUpCollection.setUpTextField(textField);
         SetUpCollection.setUpTextPane(textPane);
         SetUpCollection.setUpPanel(panelTextPane);
-        SetUpCollection.addComponentToPanel(panelTextPane, textPane);
+        SetUpCollection.addComponentToPanelWithRigidArea(panelTextPane, textPane);
         SetUpCollection.setUpPanel(panelLabels);
-        SetUpCollection.addComponentToPanelWithoutRigidArea(panelLabels,labelAccuracy);
-        SetUpCollection.addComponentToPanel(panelLabels, labelAccuracyPercentage);
-        SetUpCollection.addComponentToPanel(panelLabels, labelElapsedTime);
-        SetUpCollection.addComponentToPanel(panelLabels, labelWPM);
+        panelLabels.add(labelAccuracy);
+        SetUpCollection.addComponentToPanelWithRigidArea(panelLabels, labelAccuracyPercentage);
+        SetUpCollection.addComponentToPanelWithRigidArea(panelLabels, labelElapsedTime);
+        SetUpCollection.addComponentToPanelWithRigidArea(panelLabels, labelWPM);
         SetUpCollection.setUpLabel(labelWPM);
         SetUpCollection.setUpLabel(labelElapsedTime);
         SetUpCollection.setUpLabel(labelAccuracy);
         SetUpCollection.setUpPanel(panelButtons);
         SetUpCollection.setUpLabel(labelAccuracyPercentage);
-        SetUpCollection.addComponentToPanel(panelButtons, buttonNewText);
-        SetUpCollection.addComponentToPanel(panelButtons, buttonTryAgain);
+        SetUpCollection.addComponentToPanelWithRigidArea(panelButtons, buttonNewText);
+        SetUpCollection.addComponentToPanelWithRigidArea(panelButtons, buttonTryAgain);
         SetUpCollection.setUpButton(buttonTryAgain);
         SetUpCollection.setUpButton(buttonNewText);
+        SetUpCollection.setUpHistoryPanel(historyPanel);
+        SetUpCollection.setUpHistoryLabel(historyLabel);
+        SetUpCollection.setUpPanel(historyLabelPanel);
+        SetUpCollection.addComponentToPanelWithRigidArea(historyLabelPanel, historyLabel);
     }
 
     void addPanelsToContentPane() {
@@ -92,12 +100,20 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         getContentPane().add(Box.createRigidArea(new Dimension(0, 50)));
         getContentPane().add(panelButtons);
         getContentPane().add(Box.createRigidArea(new Dimension(0, 50)));
+        getContentPane().add(historyLabelPanel);
+        getContentPane().add(historyPanel);
+        getContentPane().add(Box.createRigidArea(new Dimension(0, 50)));
     }
 
     void addListeners() {
         textField.addKeyListener(this);
         buttonNewText.addActionListener(this);
         buttonTryAgain.addActionListener(this);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                HistoryFileReaderWriter.writeUpdatesInHistoryFile();
+            }
+        });
     }
 
     @Override
@@ -120,6 +136,10 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         buttonActionProcessor.buttonActionProcessing(actionEvent);
     }
 
+    public static JPanel getHistoryPanel() {
+        return historyPanel;
+    }
+
     public JTextPane getTextPane() {
         return textPane;
     }
@@ -132,7 +152,7 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         return labelColor;
     }
 
-    public Color getFrameBackgroundColor() {
+    public static Color getFrameBackgroundColor() {
         return frameBackgroundColor;
     }
 
