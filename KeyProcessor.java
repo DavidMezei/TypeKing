@@ -1,5 +1,8 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class KeyProcessor {
     private int caretIndex = 0;
@@ -73,18 +76,38 @@ public class KeyProcessor {
             textPaneCaretHighlighter.addHighlight(caretIndex + 1);
             if (caretIsAtTextEndAndThereIsNoWrongKeyTyped()) {
                 endThisRound();
-           }
+                updateTypingHistory();
+            }
         }
         caretIndex++;
     }
 
-    private void endThisRound(){
+    private void updateTypingHistory() {
+        TypingHistory typingHistory = createTypingHistoryFromCurrentRound();
+        HistoryFileReaderWriter.addCurrentRoundToHistory(typingHistory);
+        HistoryPanelUploader.addTypingHistoryToHistoryPanel(typingHistory);
+    }
+
+    private TypingHistory createTypingHistoryFromCurrentRound() {
+        TypingHistory typingHistory = new TypingHistory();
+        String accuracyPercentage = mainFrame.getLabelAccuracyPercentage().getText();
+        String elapsedTime = mainFrame.getLabelElapsedTime().getText();
+        String wpm = mainFrame.getLabelWPM().getText();
+        typingHistory.setDate(LocalDate.now().toString());
+        typingHistory.setTime(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        typingHistory.setAccuracy(Float.parseFloat(accuracyPercentage.substring(0, accuracyPercentage.length() - 1)));
+        typingHistory.setElapsedTime(elapsedTime.substring(6));
+        typingHistory.setWpm(Integer.parseInt(wpm.substring(0, wpm.length() - 4)));
+        return typingHistory;
+    }
+
+    private void endThisRound() {
         mainFrame.getTextField().setText("");
         mainFrame.getTextField().setEditable(false);
         labelsThread.stopLabelsThread();
     }
 
-    private boolean caretIsAtTextEndAndThereIsNoWrongKeyTyped(){
+    private boolean caretIsAtTextEndAndThereIsNoWrongKeyTyped() {
         return caretIndex == textPaneText.length() - 1 && textPaneRedHighlighter.getHighlightsMap().isEmpty();
     }
 
