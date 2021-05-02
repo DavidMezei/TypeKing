@@ -15,6 +15,12 @@ public class LabelsThread extends Thread {
 
     public void stopLabelsThread() {
         stopThread = true;
+        this.interrupt();
+        try {
+            this.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
