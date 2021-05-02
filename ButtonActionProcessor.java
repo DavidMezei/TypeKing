@@ -27,7 +27,6 @@ public class ButtonActionProcessor {
         keyProcessor.setTextPaneText(TextFileReader.getRandomText());
         mainFrame.getTextPane().setText(keyProcessor.getTextPaneText());
         HistoryPanelUploader.uploadLoadedHistoriesToPanel();
-        mainFrame.revalidate();
     }
 
     private void processButton() {
