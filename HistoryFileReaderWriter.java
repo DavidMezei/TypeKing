@@ -4,7 +4,7 @@ import java.util.Vector;
 
 public class HistoryFileReaderWriter {
     private static Vector<Vector<TypingHistory>> typingHistories;
-    private static final String fileName = "C:\\Users\\mezei\\Desktop\\Java Programs\\TypeKing\\src\\history.txt";
+    private static final String fileName = ".\\src\\history.txt";
     private int historyLineIndex;
 
     public HistoryFileReaderWriter() {

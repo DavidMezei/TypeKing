@@ -10,7 +10,7 @@ public class TextFileReader {
     private static int currentTextIndex = -1;
     private static boolean firstCall = true;
     private static Vector<String> textList = new Vector<String>();
-    private final String fileName = "C:\\Users\\mezei\\Desktop\\Java Programs\\TypeKing\\src\\texts.txt";
+    private final String fileName = ".\\src\\texts.txt";
 
     public TextFileReader() {
         String text = "";
