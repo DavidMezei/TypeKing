@@ -1,13 +1,13 @@
+package View;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
 
-public class MainFrame extends JFrame implements KeyListener, ActionListener {
+public class MainFrame extends JFrame {
     private JTextPane textPane;
     private JTextField textField;
     private Color labelColor;
-    private static Color frameBackgroundColor;
+    private Color frameBackgroundColor;
     private Color textBackgroundColor;
     private Color textColor;
     private String defaultFont;
@@ -21,45 +21,36 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
     private JLabel labelElapsedTime;
     private JLabel labelAccuracy;
     private JLabel labelAccuracyPercentage;
-    private KeyProcessor keyProcessor;
-    private ButtonActionProcessor buttonActionProcessor;
     private SetUpCollection SetUpCollection;
-    private static JPanel historyPanel;
+    private JPanel historyPanel;
     private JLabel historyLabel;
     private JPanel historyLabelPanel;
 
-    MainFrame() {
+    public MainFrame() {
         createAndInitializeObjects();
         addPanelsToContentPane();
         callSetUps();
-        addListeners();
         revalidate();
     }
 
     private void createAndInitializeObjects() {
-        labelColor = Color.cyan;
-        frameBackgroundColor = Color.black;
-        textBackgroundColor = Color.darkGray.darker();
-        textColor = Color.white;
-        defaultFont = "TimesRoman";
         SetUpCollection = new SetUpCollection(this);
         textPane = new JTextPane();
         textField = new JTextField();
-        buttonTryAgain = new JButton("Try again");
-        buttonNewText = new JButton("New Text");
+        buttonTryAgain = new JButton();
+        buttonNewText = new JButton();
         panelTextPane = new JPanel();
         panelTextField = new JPanel();
         panelLabels = new JPanel();
         panelButtons = new JPanel();
-        labelWPM = new JLabel("0 WPM");
-        labelElapsedTime = new JLabel("Time: 0:00");
-        labelAccuracy = new JLabel("Accuracy: ");
-        labelAccuracyPercentage = new JLabel("100%");
-        keyProcessor = new KeyProcessor(this);
-        buttonActionProcessor = new ButtonActionProcessor(this);
+        labelWPM = new JLabel();
+        labelElapsedTime = new JLabel();
+        labelAccuracy = new JLabel();
+        labelAccuracyPercentage = new JLabel();
         historyPanel = new JPanel();
         historyLabel = new JLabel();
         historyLabelPanel = new JPanel();
+        SetUpCollection.setDefaultSettings();
     }
 
     private void callSetUps() {
@@ -105,38 +96,35 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         getContentPane().add(Box.createRigidArea(new Dimension(0, 50)));
     }
 
-    void addListeners() {
-        textField.addKeyListener(this);
-        buttonNewText.addActionListener(this);
-        buttonTryAgain.addActionListener(this);
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent we) {
-                HistoryFileReaderWriter.writeUpdatesInHistoryFile();
-            }
-        });
+    public void setTextPane(JTextPane textPane) {
+        this.textPane = textPane;
     }
 
-    @Override
-    public void keyPressed(KeyEvent keyEvent) {
-        keyProcessor.keyProcessing(keyEvent);
+    public void setTextField(JTextField textField) {
+        this.textField = textField;
     }
 
-    @Override
-    public void keyReleased(KeyEvent e) {
-
+    public void setLabelColor(Color labelColor) {
+        this.labelColor = labelColor;
     }
 
-    @Override
-    public void keyTyped(KeyEvent e) {
-
+    public void setFrameBackgroundColor(Color frameBackgroundColor) {
+        this.frameBackgroundColor = frameBackgroundColor;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        buttonActionProcessor.buttonActionProcessing(actionEvent);
+    public void setTextBackgroundColor(Color textBackgroundColor) {
+        this.textBackgroundColor = textBackgroundColor;
     }
 
-    public static JPanel getHistoryPanel() {
+    public void setTextColor(Color textColor) {
+        this.textColor = textColor;
+    }
+
+    public void setDefaultFont(String defaultFont) {
+        this.defaultFont = defaultFont;
+    }
+
+    public JPanel getHistoryPanel() {
         return historyPanel;
     }
 
@@ -152,7 +140,7 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
         return labelColor;
     }
 
-    public static Color getFrameBackgroundColor() {
+    public Color getFrameBackgroundColor() {
         return frameBackgroundColor;
     }
 
@@ -206,14 +194,6 @@ public class MainFrame extends JFrame implements KeyListener, ActionListener {
 
     public JLabel getLabelAccuracyPercentage() {
         return labelAccuracyPercentage;
-    }
-
-    public KeyProcessor getKeyProcessor() {
-        return keyProcessor;
-    }
-
-    public ButtonActionProcessor getButtonActionProcessor() {
-        return buttonActionProcessor;
     }
 
 }

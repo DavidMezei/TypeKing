@@ -1,47 +1,60 @@
-import java.io.*;
+package Model;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.Vector;
 
-public class HistoryFileReaderWriter {
-    private static Vector<Vector<TypingHistory>> typingHistories;
-    private static final String fileName = "C:\\Users\\mezei\\Desktop\\Java Programs\\TypeKing\\src\\history.txt";
+public class HistoryFileReaderWriter implements HistoryReaderWriter {
+    private Vector<Vector<TypingHistory>> typingHistories;
+    private String fileName = "./src/history.txt";
     private int historyLineIndex;
 
+    public HistoryFileReaderWriter(String fileNameFullPath) {
+        this.fileName = fileNameFullPath;
+        readHistory();
+    }
+
     public HistoryFileReaderWriter() {
+        readHistory();
+    }
+
+    private void readHistory() {
         String historyLine;
         TypingHistory typingHistory;
         typingHistories = new Vector<Vector<TypingHistory>>();
         File file = new File(fileName);
-        Scanner scanner = null;
         try {
-            scanner = new Scanner(file);
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                historyLine = scanner.nextLine();
+                Vector<TypingHistory> historyLineTypingHistories = new Vector<>();
+                historyLineIndex = 0;
+                while (historyLineIndex < historyLine.length()) {
+                    typingHistory = convertAPartOfHistoryLineInTypingHistory(historyLine);
+                    historyLineTypingHistories.add(typingHistory);
+                }
+                typingHistories.add(historyLineTypingHistories);
+            }
+            scanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
-        while (scanner.hasNextLine()) {
-            historyLine = scanner.nextLine();
-            Vector<TypingHistory> historyLineTypingHistories = new Vector<>();
-            historyLineIndex = 0;
-            while (historyLineIndex < historyLine.length()) {
-                typingHistory = convertAPartOfHistoryLineInTypingHistory(historyLine);
-                historyLineTypingHistories.add(typingHistory);
-            }
-            typingHistories.add(historyLineTypingHistories);
         }
     }
 
     //TODO put try catch if index=-1
-    public static Vector<TypingHistory> getLoadedTextHistory() {
-        Vector<TypingHistory> vector = typingHistories.get(TextFileReader.getCurrentTextIndex());
-
-        return vector;
+    public Vector<TypingHistory> getTextHistory(int textIndex) {
+        return typingHistories.get(textIndex);
     }
 
-    public static void addCurrentRoundToHistory(TypingHistory typingHistory) {
-        typingHistories.get(TextFileReader.getCurrentTextIndex()).add(typingHistory);
+    public void addRoundToHistory(int textIndex, TypingHistory typingHistory) {
+        typingHistories.get(textIndex).add(typingHistory);
+        writeUpdatesInHistoryFile();
     }
 
-    public static void writeUpdatesInHistoryFile() {
+    public void writeUpdatesInHistoryFile() {
         try {
             FileWriter fileWriter = new FileWriter(fileName);
             String historyLine = convertTypingHistoriesToHistoryLine(typingHistories.get(0));
@@ -92,7 +105,7 @@ public class HistoryFileReaderWriter {
         return i;
     }
 
-    private static String convertTypingHistoriesToHistoryLine(Vector<TypingHistory> typingHistories) {
+    private String convertTypingHistoriesToHistoryLine(Vector<TypingHistory> typingHistories) {
         int i = 0;
         String historyLine = "";
         while (i < typingHistories.size()) {

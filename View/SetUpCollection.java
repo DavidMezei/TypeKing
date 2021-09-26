@@ -1,3 +1,5 @@
+package View;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,7 +11,7 @@ public class SetUpCollection {
     }
 
     public void setUpPanel(JPanel panel) {
-        panel.setBackground(MainFrame.getFrameBackgroundColor());
+        panel.setBackground(mainFrame.getFrameBackgroundColor());
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         panel.add(Box.createRigidArea(new Dimension(50, 0)));
     }
@@ -22,9 +24,6 @@ public class SetUpCollection {
         JScrollPane scrollPane = new JScrollPane(innerPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         panel.add(scrollPane);
-        panel.add(Box.createRigidArea(new Dimension(50, 0)));
-        new HistoryFileReaderWriter();
-        HistoryPanelUploader.uploadLoadedHistoriesToPanel();
     }
 
     public void setUpHistoryLabel(JLabel label) {
@@ -41,7 +40,6 @@ public class SetUpCollection {
     }
 
     public void setUpTextPane(JTextPane textPane) {
-        textPane.setText(TextFileReader.getRandomText());
         textPane.setMaximumSize(new Dimension(1200, 200));
         textPane.setFont(new Font(mainFrame.getDefaultFont(), Font.PLAIN, 40));
         textPane.setEditable(false);
@@ -66,7 +64,7 @@ public class SetUpCollection {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.setBounds(600, 200, 1000, 1000);
-        frame.getContentPane().setBackground(MainFrame.getFrameBackgroundColor());
+        frame.getContentPane().setBackground(mainFrame.getFrameBackgroundColor());
         frame.setLocationRelativeTo(null);
     }
 
@@ -81,5 +79,19 @@ public class SetUpCollection {
         button.setFont(new Font(mainFrame.getDefaultFont(), Font.PLAIN, 45));
         button.setForeground(Color.orange);
         button.setBackground(Color.blue.darker());
+    }
+
+    public void setDefaultSettings() {
+        mainFrame.setLabelColor(Color.cyan);
+        mainFrame.setFrameBackgroundColor(Color.black);
+        mainFrame.setTextBackgroundColor(Color.darkGray.darker());
+        mainFrame.setTextColor(Color.white);
+        mainFrame.setDefaultFont("TimesRoman");
+        mainFrame.getButtonNewText().setText("New text");
+        mainFrame.getButtonTryAgain().setText("Try again");
+        mainFrame.getLabelWPM().setText("0 WPM");
+        mainFrame.getLabelElapsedTime().setText("Time: 0:00");
+        mainFrame.getLabelAccuracy().setText("Accuracy: ");
+        mainFrame.getLabelAccuracyPercentage().setText("100%");
     }
 }

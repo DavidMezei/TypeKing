@@ -1,4 +1,4 @@
-import org.w3c.dom.Text;
+package Model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,13 +6,21 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
 
-public class TextFileReader {
-    private static int currentTextIndex = -1;
-    private static boolean firstCall = true;
-    private static Vector<String> textList = new Vector<String>();
-    private final String fileName = "C:\\Users\\mezei\\Desktop\\Java Programs\\TypeKing\\src\\texts.txt";
+public class ReadTextFromFile implements ReadText {
+    private boolean firstCall = true;
+    private Vector<String> textList = new Vector<String>();
+    private String fileName = "./src/texts.txt";
 
-    public TextFileReader() {
+    public ReadTextFromFile(String fileNameFullPath) {
+        this.fileName = fileNameFullPath;
+        readTextsFromFile();
+    }
+
+    public ReadTextFromFile() {
+        readTextsFromFile();
+    }
+
+    private void readTextsFromFile() {
         String text = "";
         String nextLine;
         File file = new File(fileName);
@@ -27,27 +35,22 @@ public class TextFileReader {
                 text += nextLine;
             }
             textList.add(text);
+            scanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public static String getRandomText() {
+    public MyText getRandomText() {
         Random random = new Random();
         if (firstCall) {
             firstCall = false;
-            new TextFileReader();
+            new ReadTextFromFile();
         }
         int randomIndex;
-        do {
-            randomIndex = random.nextInt(textList.size());
-        } while (randomIndex == currentTextIndex);
-        currentTextIndex =randomIndex;
+        randomIndex = random.nextInt(textList.size());
 
-        return textList.get(randomIndex);
+        return new MyText(textList.get(randomIndex), randomIndex);
     }
 
-    public static int getCurrentTextIndex() {
-        return currentTextIndex;
-    }
 }
