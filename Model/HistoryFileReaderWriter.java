@@ -9,7 +9,7 @@ import java.util.Vector;
 
 public class HistoryFileReaderWriter implements HistoryReaderWriter {
     private Vector<Vector<TypingHistory>> typingHistories;
-    private String fileName = "./src/history.txt";
+    private String fileName = "./history.txt";
     private int historyLineIndex;
 
     public HistoryFileReaderWriter(String fileNameFullPath) {
