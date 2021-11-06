@@ -9,7 +9,7 @@ import java.util.Vector;
 public class ReadTextFromFile implements ReadText {
     private boolean firstCall = true;
     private Vector<String> textList = new Vector<String>();
-    private String fileName = "./src/texts.txt";
+    private String fileName = "./texts.txt";
 
     public ReadTextFromFile(String fileNameFullPath) {
         this.fileName = fileNameFullPath;
