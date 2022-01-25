@@ -10,7 +10,7 @@
 
 <br />
 
-### Ctrl+Backspace implementaion
+### Ctrl+Backspace implementation
 
 <p><img align="center" alt="gif" src="https://github.com/DavidMezei/TypeKing/blob/master/assets/Backspace.gif" widt="100" height="320" /></p>
 
